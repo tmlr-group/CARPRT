@@ -108,11 +108,11 @@ python test.py \
 If you use this code or the CARPRT method, please cite **the CARPRT paper** (replace with the official BibTeX once available).
 
 ```bibtex
-@article{carprt,
-  title   = {CARPRT: Class-Aware Reweighting of Prompt Templates at Test Time},
-  author  = {TODO},
-  journal = {TODO},
-  year    = {TODO}
+@inproceedings{dong2026carprt,
+  title     = {CARPRT: Class-Aware Zero-Shot Prompt Reweighting for Black-Box Vision-Language Models},
+  author    = {Dong, Ruijiang and Ye, Zesheng and Qi, Jianzhong and Feng, Lei and Liu, Feng and Niu, Gang and Sugiyama, Masashi},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2026}
 }
 ```
 
