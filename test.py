@@ -1,5 +1,4 @@
 import argparse
-import time
 
 import clip
 import torch
@@ -27,7 +26,7 @@ def get_arguments():
         '--data-root',
         dest='data_root',
         type=str,
-        default='/data/gpfs/projects/punim2161/datasets',
+        default='/projects/datasets',
         help='Root directory of benchmark datasets.',
     )
     parser.add_argument(
@@ -65,8 +64,6 @@ def run_test_carprt(loader, clip_model, text_feature, temp):
         carprt_weight = torch.zeros((num_prompt, num_class), dtype=torch.float32, device=device)
         carprt_count = torch.zeros((num_prompt, num_class), dtype=torch.long, device=device)
 
-        start_time = time.time()
-
         for images, _target in loader:
             images = images.to(device)
             logits = get_clip_logits(images, clip_model, text_feature)
@@ -80,8 +77,6 @@ def run_test_carprt(loader, clip_model, text_feature, temp):
         carprt_weight = carprt_weight / carprt_safe_count
         carprt_weight = F.softmax(carprt_weight / temp, dim=0)
 
-        estimate_time = time.time() - start_time
-
     accuracies_carprt = []
     for images, target in loader:
         images = images.to(device)
@@ -90,7 +85,7 @@ def run_test_carprt(loader, clip_model, text_feature, temp):
         acc = cls_acc(logits, target)
         accuracies_carprt.append(acc)
 
-    return sum(accuracies_carprt) / len(accuracies_carprt), estimate_time
+    return sum(accuracies_carprt) / len(accuracies_carprt)
 
 
 def main():
@@ -104,13 +99,11 @@ def main():
     for dataset_name in datasets:
         print(f"Processing {dataset_name} dataset.")
         test_loader, classnames, template = build_test_data_loader(dataset_name, args.data_root, preprocess)
-        print("---- The temperature: {}. ----\n".format(args.temp))
 
         text_feature = clip_classifier(classnames, template, clip_model)
-        acc_wpe, estimate_time = run_test_carprt(test_loader, clip_model, text_feature, args.temp)
+        acc_wpe = run_test_carprt(test_loader, clip_model, text_feature, args.temp)
 
         print("---- CARPRT's test accuracy: {:.2f}. ----\n".format(acc_wpe))
-        print("---- Estimate weight time: {:.4f} seconds. ----\n".format(estimate_time))
 
 
 if __name__ == "__main__":
